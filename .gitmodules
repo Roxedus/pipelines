@@ -1,0 +1,3 @@
+[submodule "traefik-cloudflare-tunnel"]
+	path = traefik-cloudflare-tunnel
+	url = https://github.com/justmiles/traefik-cloudflare-tunnel
