@@ -1,4 +1,4 @@
-name: Build Image On Release
+name: Build traefik-cloudflare-tunnel
 
 on:
   push:
