@@ -3,8 +3,9 @@ name: Build traefik-cloudflare-tunnel
 on:
   push:
     paths:
-      - "traefik-cloudflare-tunnel/**"
       - ".github/workflows/traefik-cloudflare-tunnel.yml"
+      - "traefik-cloudflare-tunnel-bake.hcl"
+      - "traefik-cloudflare-tunnel/**"
     branches:
       - main
 
