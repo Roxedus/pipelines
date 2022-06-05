@@ -11,7 +11,6 @@ target "image" {
 
 target "all" {
   inherits = ["image"]
-  dockerfile = "traefik-cloudflare-tunnel/Dockerfile"
   platforms = [
     "linux/amd64",
     "linux/arm64",
