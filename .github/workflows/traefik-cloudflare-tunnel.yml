@@ -35,7 +35,7 @@ jobs:
             org.opencontainers.image.title=traefik-cloudflare-tunnel
             org.opencontainers.image.description="https://github.com/justmiles/traefik-cloudflare-tunnel"
             org.opencontainers.image.vendor=roxedus
-            org.opencontainers.image.source="https://github.com/justmiles/traefik-cloudflare-tunnel"
+            org.opencontainers.image.source="https://github.com/roxedus/pipelines"
             org.opencontainers.image.version="${{ steps.gen_meta.outputs.sub_sha }}"
           tags: |
             type=raw,value=latest
