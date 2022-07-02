@@ -20,7 +20,8 @@ jobs:
       - name: Generate metadata
         id: gen_meta
         run: |
-          echo ::set-output name=sub_sha::${GITHUB_EVENT_INPUTS_CLOUDFLARED_VERSION}
+          echo "${{ github.event.inputs.cloudflared_version }}"
+          echo ::set-output name=cloudflared_ver::${{ github.event.inputs.cloudflared_version }}
 
       - name: Docker meta
         id: docker_meta
@@ -33,10 +34,10 @@ jobs:
             org.opencontainers.image.description="https://github.com/cloudflare/cloudflared"
             org.opencontainers.image.vendor=roxedus
             org.opencontainers.image.source="https://github.com/roxedus/pipelines"
-            org.opencontainers.image.version="${{ steps.gen_meta.outputs.sub_sha }}"
+            org.opencontainers.image.version="${{ steps.gen_meta.outputs.cloudflared_ver }}"
           tags: |
             type=raw,value=latest
-            type=raw,value=${{ steps.gen_meta.outputs.sub_sha }}
+            type=raw,value=${{ steps.gen_meta.outputs.cloudflared_ver }}
           flavor: |
             prefix=cloudflared-,onlatest=true
 
@@ -56,6 +57,7 @@ jobs:
       - name: Build and push
         uses: docker/bake-action@v2.0.0
         with:
+          set: "image.context=https://github.com/cloudflare/cloudflared.git#${{ steps.gen_meta.outputs.cloudflared_ver }}"
           files: |
             ./cloudflared-bake.hcl
             ${{ steps.docker_meta.outputs.bake-file }}
@@ -64,7 +66,7 @@ jobs:
 
       - name: Update version
         run: |
-          echo "${{ steps.gen_meta.outputs.sub_sha }}" > cloudflared_version.txt
+          echo "${{ steps.gen_meta.outputs.cloudflared_ver }}" > cloudflared_version.txt
           git config --global user.name 'rox'
           git config --global user.email 'roxedus@users.noreply.github.com'
           git add cloudflared_version.txt

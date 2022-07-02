@@ -6,6 +6,7 @@ on:
   push:
     paths:
       - ".github/workflows/cloudflared-trigger.yml"
+      - ".github/workflows/cloudflared-bake.yml"
 jobs:
   updates:
     name: Check latest version
@@ -14,6 +15,7 @@ jobs:
       - name: Create VARS
         run: |
           export CLOUDFLARED_VERSION=$(curl -sX GET https://api.github.com/repos/cloudflare/cloudflared/releases/latest | awk '/tag_name/{print $4;exit}' FS='[""]')
+          echo "${CLOUDFLARED_VERSION}"
           if  [[ $(< cloudflared_version.txt) != "${CLOUDFLARED_VERSION}" ]]; then
             curl \
               -X POST \
