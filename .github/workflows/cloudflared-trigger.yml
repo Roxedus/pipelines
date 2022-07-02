@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Create VARS
         run: |
-          export CLOUDFLARED_VERSION=$(curl -sX GET https://api.github.com/repos/archmonger/releases/latest | awk '/tag_name/{print $4;exit}' FS='[""]')
+          export CLOUDFLARED_VERSION=$(curl -sX GET https://api.github.com/repos/cloudflare/cloudflared/releases/latest | awk '/tag_name/{print $4;exit}' FS='[""]')
           if  [[ $(< cloudflared_version.txt) != "${CLOUDFLARED_VERSION}" ]]; then
             curl \
               -X POST \

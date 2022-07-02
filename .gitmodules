@@ -3,5 +3,5 @@ path = traefik-cloudflare-tunnel
 url = https://github.com/justmiles/traefik-cloudflare-tunnel
 
 [submodule "cloudflared"]
-path = cloudflared
-url = https://github.com/cloudflare/cloudflared
+	path = cloudflared
+	url = https://github.com/cloudflare/cloudflared
