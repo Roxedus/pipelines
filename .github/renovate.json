@@ -4,6 +4,9 @@
     ],
     "automerge": true,
     "git-submodules": {
-        "enabled": true
+        "enabled": true,
+        "ignoreDeps": [
+            "cloudflared"
+        ]
     }
 }

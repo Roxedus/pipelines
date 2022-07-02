@@ -1,29 +1,26 @@
-name: Build traefik-cloudflare-tunnel
+name: Build cloudflared
 
 on:
-  push:
-    paths:
-      - ".github/workflows/traefik-cloudflare-tunnel.yml"
-      - "traefik-cloudflare-tunnel-bake.hcl"
-      - "traefik-cloudflare-tunnel/**"
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      cloudflared_version:
+        description: "Commit to build"
+        required: true
 
 jobs:
-  bake-traefik-cloudflare-tunnel:
+  bake-cloudflared-bake:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           submodules: true
+          token: ${{ secrets.PERSONAL_TOKEN }}
 
       - name: Generate metadata
         id: gen_meta
         run: |
-          SUBMODULE=$(git submodule status traefik-cloudflare-tunnel | awk '{print substr($1,0,8);}')
-          echo "**** Setting build date to $BUILD_DATE ****"
-          echo ::set-output name=sub_sha::${SUBMODULE}
+          echo ::set-output name=sub_sha::${GITHUB_EVENT_INPUTS_CLOUDFLARED_VERSION}
 
       - name: Docker meta
         id: docker_meta
@@ -32,8 +29,8 @@ jobs:
           images: |
             ghcr.io/roxedus/pipelines
           labels: |
-            org.opencontainers.image.title=traefik-cloudflare-tunnel
-            org.opencontainers.image.description="https://github.com/justmiles/traefik-cloudflare-tunnel"
+            org.opencontainers.image.title=cloudflared
+            org.opencontainers.image.description="https://github.com/cloudflare/cloudflared"
             org.opencontainers.image.vendor=roxedus
             org.opencontainers.image.source="https://github.com/roxedus/pipelines"
             org.opencontainers.image.version="${{ steps.gen_meta.outputs.sub_sha }}"
@@ -41,7 +38,7 @@ jobs:
             type=raw,value=latest
             type=raw,value=${{ steps.gen_meta.outputs.sub_sha }}
           flavor: |
-            prefix=traefik-cloudflare-tunnel-,onlatest=true
+            prefix=cloudflared-,onlatest=true
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -60,7 +57,16 @@ jobs:
         uses: docker/bake-action@v2.0.0
         with:
           files: |
-            ./traefik-cloudflare-tunnel-bake.hcl
+            ./cloudflared-bake.hcl
             ${{ steps.docker_meta.outputs.bake-file }}
           targets: all
           push: true
+
+      - name: Update version
+        run: |
+          echo "${{ steps.gen_meta.outputs.sub_sha }}" > cloudflared_version.txt
+          git config --global user.name 'rox'
+          git config --global user.email 'roxedus@users.noreply.github.com'
+          git add cloudflared_version.txt
+          git commit -m "Automated bump"
+          git push
