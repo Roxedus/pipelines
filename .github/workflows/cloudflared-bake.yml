@@ -55,7 +55,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        uses: docker/bake-action@v4.2.0
+        uses: docker/bake-action@v4.3.0
         with:
           set: "image.context=https://github.com/cloudflare/cloudflared.git#${{ steps.gen_meta.outputs.cloudflared_ver }}"
           files: |
