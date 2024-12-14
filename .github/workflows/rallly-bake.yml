@@ -1,14 +1,14 @@
-name: Build cloudflared
+name: Build Rallly
 
 on:
   workflow_dispatch:
     inputs:
-      cloudflared_version:
+      rallly_version:
         description: "Commit to build"
         required: true
 
 jobs:
-  bake-cloudflared-bake:
+  bake-rallly-bake:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -20,8 +20,8 @@ jobs:
       - name: Generate metadata
         id: gen_meta
         run: |
-          echo "${{ github.event.inputs.cloudflared_version }}"
-          echo ::set-output name=cloudflared_ver::${{ github.event.inputs.cloudflared_version }}
+          echo "${{ github.event.inputs.rallly_version }}"
+          echo ::set-output name=rallly_ver::${{ github.event.inputs.rallly_version }}
 
       - name: Docker meta
         id: docker_meta
@@ -30,16 +30,16 @@ jobs:
           images: |
             ghcr.io/roxedus/pipelines
           labels: |
-            org.opencontainers.image.title=cloudflared
-            org.opencontainers.image.description="https://github.com/cloudflare/cloudflared"
+            org.opencontainers.image.title=rallly
+            org.opencontainers.image.description="https://github.com/lukevella/rallly"
             org.opencontainers.image.vendor=roxedus
             org.opencontainers.image.source="https://github.com/roxedus/pipelines"
-            org.opencontainers.image.version="${{ steps.gen_meta.outputs.cloudflared_ver }}"
+            org.opencontainers.image.version="${{ steps.gen_meta.outputs.rallly_ver }}"
           tags: |
             type=raw,value=latest
-            type=raw,value=${{ steps.gen_meta.outputs.cloudflared_ver }}
+            type=raw,value=${{ steps.gen_meta.outputs.rallly_ver }}
           flavor: |
-            prefix=cloudflared-,onlatest=true
+            prefix=rallly-,onlatest=true
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -57,18 +57,21 @@ jobs:
       - name: Build and push
         uses: docker/bake-action@v5.1.0
         with:
-          set: "image.context=https://github.com/cloudflare/cloudflared.git#${{ steps.gen_meta.outputs.cloudflared_ver }}"
+          set: |
+            image.context=https://github.com/lukevella/rallly.git#${{ steps.gen_meta.outputs.rallly_ver }}
+            image.args.APP_VERSION=${{ steps.gen_meta.outputs.rallly_ver }}
+            image.args.SELF_HOSTED=true
           files: |
-            ./cloudflared-bake.hcl
+            ./rallly-bake.hcl
             ${{ steps.docker_meta.outputs.bake-file }}
           targets: all
           push: true
 
       - name: Update version
         run: |
-          echo "${{ steps.gen_meta.outputs.cloudflared_ver }}" > cloudflared_version.txt
+          echo "${{ steps.gen_meta.outputs.rallly_ver }}" > rallly_version.txt
           git config --global user.name 'rox'
           git config --global user.email 'roxedus@users.noreply.github.com'
-          git add cloudflared_version.txt
+          git add rallly_version.txt
           git commit -m "Automated bump"
           git push
